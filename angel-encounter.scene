@@ -1,0 +1,107 @@
+You close the door behind you and sag against it with a sigh. Ugh, what a day. "Does anyone *else* have any terrifying revelations for me?" you ask.
+
+The room explodes into blinding light, casting razor-edged shadows on all four walls. A being of terrifying luminosity, many-winged and covered in eyes, stands in your living room.
+
+"FEAR NOT."
+
+---
+> Panic: Angel description
+
+===
+Angel description:
+
+You blink the spots out of your vision and peer at the creature as your eyes adjust.
+
+Hovering an inch above your floor is a gyroscope-looking assembly of wheels, nested at right angles to each other. The wheels sparkle, whir, and flash with energy, filling the air with a metallic, rainy smell.
+
+Hovering above this assembly is a glowing being with three faces. An eagle's head looks to your left, a lion's somber visage looks to your right, and looking grimly at you is a man with rough features and wavy brown hair.
+
+A pair of enormous, white, feathery wings jut from his bare shoulders and take up most of the space in your living room. A smaller pair of feathery wings wraps around his torso and fades into the whirring assembly below. 
+
+He's surrounded by glowing white fog, from which forks of lightning occasionally shoot into the floor. Most unnerving of all are the eyes that keep fading in and out on him, on his wings, and on the whirring wheels--they appear, blink at you, then fade away, reappearing in another place to look at something else.
+
+He seems to be waiting for you to say something.
+
+---
+> "Who are you?" = Who
+> "What are you?": Cherubim = What
+> "What the &#$!?"
+
+===
+"What the &#$!?":
+
+The creature's expression changes from stern to...weary? You suddenly get the impression it's not happy to be here.
+
+---
+Who
+What
+
+===
+"Who are you?":
+
+"I am Rikbiel. I have been sent by the Living God, the Lord of Hosts, to be your guide.
+
+"The Holy One has related to mankind in different ways through different periods of your history. A new chapter is beginning now. The Almighty has seen fit to invest His power into people of His choosing, and to send Cherubim to guide them.
+
+"You are among the chosen."
+
+---
+> "Cherubim?": Cherubim
+> "Wait, you're saying you were sent by God?"
+> "What do you mean, chosen?": Why did God pick me?
+?saw all of ["Who are you?", "Cherubim"]: "Power?": "Why are you here?"
+
+===
+Cherubim:
+
+"I am a cherub, guardian of the Inner Gates, chief of the Celestial Wheel, and now protector of the Lord's Chosen."
+
+---
+> "Do you have a name?": "Who are you?"
+> "A cherub? Aren't you supposed to be a cute little baby?"
+
+===
+"A cherub? Aren't you supposed to be a cute little baby?":
+
+The cherub stares at you impassively. It is not a cute little baby. Somebody should tell the Vatican.
+
+---
+> "Do you have a name?": "Who are you?"
+?saw all of ["Who are you?", "Cherubim"]: "Why are you here?" = Why
+
+===
+"Why did God pick me?":
+
+The cherub shrugs. "God acts through whom He wills. Sometimes he acts through those who have demonstrated reliable good character. Other times he acts through the weak, to show that He can. God's kingdom is not a meritocracy.
+
+"In this case, you have demonstrated unusual kindness. I am here to guide you further along that path."
+
+---
+> "What are you?": Cherubim
+Why
+
+===
+"Wait, you're saying you were sent by God?":
+
+He rises slightly off the floor. "Holy, holy, holy is the Lord of Hosts! He is worthy to receive all honor and glory and power in the universe, for He created all things, and by His will they live and move and have their being." The creature's radiance increases, and the air is filled with thunder and lightning.
+
+---
+> "Hang on. I don't believe in God."
+> "Why did God pick me?"
+
+===
+"Hang on. I don't believe in God."
+
+The creature nods seriously. "Your culture has a strong focus on the intellect, to the exclusion of other parts of your being. You overvalue it. Intellectual belief in God is not as central as you have been told.
+
+"God is love. All else flows from that. By your actions, you have demonstrated your commitment to loving others. That is why you were chosen."
+
+---
+Who
+What
+Why
+
+===
+!"Why are you here?":
+
+"You are being granted..."
