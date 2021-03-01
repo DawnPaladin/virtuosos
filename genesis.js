@@ -16,14 +16,14 @@ function processPassages(scene) {
 	scene
 		.split('===')
 		.forEach(passageText => {
-			var name = "";
+			var name = "Start";
 			const pieces = passageText.split("---");
 			var paragraphs = pieces[0].split('\n\n');
 			if (paragraphs[0].trim().substr(-1, 1) == ":") { // if first paragraph ends with :
 				name = paragraphs.shift().slice(0, -1).replaceAll("\"", "").trim(); // give the passage a name
 			}
 			if (names.includes(name)) {
-				if (name == "") {
+				if (name == "Start") {
 					throw new Error("Only one passage name can be empty." + passageText)
 				}
 				throw new Error("Duplicate passage name", name);
@@ -112,7 +112,7 @@ loadScene()
 	.then(passages => {
 		window.passages = passages;
 		console.log(passages)
-		populatePage(passages[""]);
+		populatePage(passages.Start);
 	})
 ;
 
