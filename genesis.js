@@ -77,14 +77,26 @@ function processChoices(choicesText) {
 				if (choiceObj.name == "") choiceObj.name = newChoiceString;
 				if (choiceObj.target == "") choiceObj.target = newChoiceString;
 			} else if (choiceText[0] == "?") {
+				// parse(choiceText, "?saw all of", function())
 				// TODO
+				choiceObj = { name: "conditional link", target: "Start" }
 			} else { // choiceText is the name of a shortcut
 				// TODO
+				choiceObj = { name: "shortcut", target: "Start" }
 				// choiceObj = window.choiceShortcuts[choiceText];
 			}
 		return choiceObj;
 	});
 	return choices;
+}
+
+function parse(string, substring, callback) {
+	if (string.startsWith(substring)) {
+		var newString = string.slice(substring.length);
+		return callback(newString);
+	} else {
+		return false;
+	}
 }
 
 function containsMultiple(string, searchCharacter) {
