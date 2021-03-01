@@ -1,8 +1,12 @@
+html {
+	height: 100%;
+}
 body {
 	background: #20283D;
 	color: white;
 	font-family: 'Roboto Slab', serif;
 	margin: 0;
+	height: 100%;
 }
 main {
 	display: flex;
@@ -21,9 +25,32 @@ section {
 .last-choice-container {
 	background: #171D2E;
 }
-#current-passage {
+.current-passage-container {
 	flex-grow: 1;
 }
+#current-passage {
+	flex-grow: 1;
+	font-size: 18px;
+}
 .choices-container {
+	flex-grow: 1;
 	background: #171D2E;
+	padding: 1em 0;
+}
+#choices {
+	font-size: 24px;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+#choices a {
+	color: white;
+	text-decoration: none;
+	opacity: .75;
+	transition: opacity .25s;
+	margin: .5em 0;
+}
+#choices a:hover {
+	opacity: 1;
 }

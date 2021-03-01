@@ -8,26 +8,37 @@ async function loadScene() {
 	}
 }
 
+const passages = {};
+const choiceShortcuts = {};
+
 function processPassages(scene) {
-	window.choiceShortcuts = {};
-	const passages = scene
+	const names = [];
+	scene
 		.split('===')
-		.map(passage => {
+		.forEach(passageText => {
 			var name = "";
-			const pieces = passage.split("---");
+			const pieces = passageText.split("---");
 			var paragraphs = pieces[0].split('\n\n');
 			if (paragraphs[0].trim().substr(-1, 1) == ":") { // if first paragraph ends with :
-				name = paragraphs.shift().slice(0, -1); // give the passage a name
+				name = paragraphs.shift().slice(0, -1).replaceAll("\"", "").trim(); // give the passage a name
+			}
+			if (names.includes(name)) {
+				if (name == "") {
+					throw new Error("Only one passage name can be empty." + passageText)
+				}
+				throw new Error("Duplicate passage name", name);
+			} else {
+				names.push(name);
 			}
 			paragraphs = paragraphs
 				.map(paragraph => "<p>" + paragraph + "</p>")
 				.join('\n')
 			;
 			const choices = pieces.length > 1 ? processChoices(pieces[1]) : [];
-			return { name, paragraphs, choices };
+			const passage = { name, paragraphs, choices, visited: false };
+			passages[name] = passage;
 		})
 	;
-	console.log(passages);
 	return passages;
 }
 
@@ -37,6 +48,7 @@ function processChoices(choicesText) {
 		.filter(element => element != "")
 		.map(choiceText => {
 			var choiceObj = {};
+			choiceText = choiceText.replaceAll("\"", "").trim(); // strip quotes
 			if (choiceText[0] == ">") { // "> " means we're defining a new choice for the player
 				var newChoiceString = choiceText.replace("> ", "");
 				const choiceModifiers = [
@@ -44,10 +56,11 @@ function processChoices(choicesText) {
 					{ character: ":", name: "target"}
 				]
 				// if there are no modifiers, the choice's name and target default to newChoiceString
-				choiceObj.name = newChoiceString;
-				choiceObj.target = newChoiceString;
+				choiceObj.name = "";
+				choiceObj.target = "";
 				// iterate through possible choice modifiers in order, breaking down the choice string from right to left
 				(function breakdown() {
+					// if (choiceText.includes("Who are you?")) debugger;
 					choiceModifiers.forEach(modifier => {
 						if (containsMultiple(newChoiceString, modifier.character)) {
 							throw new Error(`Can't parse newChoiceString ${newChoiceString}: Contains multiple ${controlCharacter}`);
@@ -61,6 +74,8 @@ function processChoices(choicesText) {
 						}
 					})
 				})();
+				if (choiceObj.name == "") choiceObj.name = newChoiceString;
+				if (choiceObj.target == "") choiceObj.target = newChoiceString;
 			} else if (choiceText[0] == "?") {
 				// TODO
 			} else { // choiceText is the name of a shortcut
@@ -69,7 +84,6 @@ function processChoices(choicesText) {
 			}
 		return choiceObj;
 	});
-	console.log(choices);
 	return choices;
 }
 
@@ -81,18 +95,32 @@ function containsMultiple(string, searchCharacter) {
 
 function populatePage(passage) {
 	document.getElementById('current-passage').innerHTML = passage.paragraphs;
-	document.getElementById('choices').innerHTML = passage.choices.map(choice => {
-		console.log(choice)
-		return `<a href="#" data-target="${choice.target}">${choice.name}</a>`
-	});
+	document.getElementById('choices').innerHTML = passage.choices.map(passageLink).join("\n");
+	window.currentPassage = passage; // for debugging
 }
 
 function passageLink(choice) {
 	var className = choice.visited ? "visited" : "unvisited";
-	return `<a href="#" data-passage=${choice.passage} class=${className}>${choice.text}</a>`;
+	if (!Object.keys(passages).includes(choice.target)) {
+		throw new Error(choice.target + " is not a valid passage name");
+	}
+	return `<a href="#" data-target="${choice.target}" class="${className}">${choice.name}</a>`;
 }
 
 loadScene()
 	.then(scene => processPassages(scene))
-	.then(passages => populatePage(passages[0]))
+	.then(passages => {
+		window.passages = passages;
+		console.log(passages)
+		populatePage(passages[""]);
+	})
 ;
+
+const history = [];
+
+$('#choices').on('click', event => {
+	const targetName = event.target.dataset.target;
+	history.push(targetName);
+	passages[targetName].visited = true;
+	populatePage(passages[targetName]);
+})
