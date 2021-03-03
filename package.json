@@ -1,0 +1,20 @@
+{
+  "name": "virtuosos",
+  "version": "1.0.0",
+  "description": "Mass Effect meets the Stormlight Archive",
+  "main": "genesis.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DawnPaladin/virtuosos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DawnPaladin/virtuosos/issues"
+  },
+  "homepage": "https://github.com/DawnPaladin/virtuosos#readme"
+}
