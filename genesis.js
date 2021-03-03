@@ -130,9 +130,7 @@ loadScene()
 
 const history = [];
 
-$('#choices').on('click', event => {
-	const targetName = event.target.dataset.target;
-	history.push(targetName);
-	passages[targetName].visited = true;
-	populatePage(passages[targetName]);
-})
+var sum = function(a,b) {
+	return a + b;
+}
+exports.sum = sum;
