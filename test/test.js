@@ -1,5 +1,5 @@
 var assert = require('assert');
-var genesis = require('../genesis');
+var { sum } = require('../genesis');
 
 describe('Array', function() {
   describe('#indexOf()', function() {
@@ -10,7 +10,6 @@ describe('Array', function() {
 });
 
 describe("sum", function() {
-  var sum = genesis.sum;
   it('should add two numbers', () => {
     var total = sum(2,3);
     assert.equal(total, 5);
