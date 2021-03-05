@@ -87,6 +87,9 @@ var processChoices = function(choicesText) {
 							choiceObj.name = pieces[0].trim();
 							choiceObj[modifier.name] = pieces[1].trim();
 							newChoiceString = pieces[0].trim(); // cut the modifier off the end of newChoiceString
+							if (modifier.name == "shortcut") {
+								choiceShortcuts[pieces[1].trim()] = choiceObj;
+							}
 							breakdown(); // and analyze it again
 						}
 					})
@@ -98,9 +101,7 @@ var processChoices = function(choicesText) {
 				// TODO
 				choiceObj = { name: "conditional link", target: "Start" }
 			} else { // choiceText is the name of a shortcut
-				// TODO
-				choiceObj = { name: "shortcut", target: "Start", shortcut: "Test" }
-				// choiceObj = window.choiceShortcuts[choiceText];
+				choiceObj = choiceShortcuts[choiceText];
 			}
 		return choiceObj;
 	});
