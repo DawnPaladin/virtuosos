@@ -48,10 +48,16 @@ var processPassages = function(scene) {
 	return passages;
 }
 
+/** 
+ * @typedef {Object} Choice
+ * @property {String} name
+ * @property {String} target
+ * @property {String} [shortcut]
+ */
 /**
  * Turn a string containing several choices into an array of Choice objects.
  * @param {string} choicesText Choices separated by newlines
- * @returns {Array.<{name: String, target: String, [shortcut]: String}>} Array of choices
+ * @returns {Choice[]} Array of choices
  */
 var processChoices = function(choicesText) {
 	var choices = choicesText
@@ -93,7 +99,7 @@ var processChoices = function(choicesText) {
 				choiceObj = { name: "conditional link", target: "Start" }
 			} else { // choiceText is the name of a shortcut
 				// TODO
-				choiceObj = { name: "shortcut", target: "Start" }
+				choiceObj = { name: "shortcut", target: "Start", shortcut: "Test" }
 				// choiceObj = window.choiceShortcuts[choiceText];
 			}
 		return choiceObj;
