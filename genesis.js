@@ -11,7 +11,12 @@ async function loadScene() {
 const passages = {};
 const choiceShortcuts = {};
 
-function processPassages(scene) {
+/**
+ * Take the contents of a scene file and split it into an dict of Passage objects, organized by name.
+ * @param {string} scene Contents of a scene file
+ * @returns {Object}
+ */
+var processPassages = function(scene) {
 	const names = [];
 	scene
 		.split('===')
@@ -26,23 +31,29 @@ function processPassages(scene) {
 				if (name == "Start") {
 					throw new Error("Only one passage name can be empty." + passageText)
 				}
-				throw new Error("Duplicate passage name", name);
+				throw new Error("Duplicate passage name" + name);
 			} else {
 				names.push(name);
 			}
-			paragraphs = paragraphs
+			const html = paragraphs
+				.map(paragraph => paragraph.trim())
 				.map(paragraph => "<p>" + paragraph + "</p>")
 				.join('\n')
 			;
 			const choices = pieces.length > 1 ? processChoices(pieces[1]) : [];
-			const passage = { name, paragraphs, choices, visited: false };
+			const passage = { name, html, choices, visited: false };
 			passages[name] = passage;
 		})
 	;
 	return passages;
 }
 
-function processChoices(choicesText) {
+/**
+ * Turn a string containing several choices into an array of Choice objects.
+ * @param {string} choicesText Choices separated by newlines
+ * @returns {Array.<{name: String, target: String, [shortcut]: String}>} Array of choices
+ */
+var processChoices = function(choicesText) {
 	var choices = choicesText
 		.split('\n')
 		.filter(element => element != "")
@@ -63,7 +74,7 @@ function processChoices(choicesText) {
 					// if (choiceText.includes("Who are you?")) debugger;
 					choiceModifiers.forEach(modifier => {
 						if (containsMultiple(newChoiceString, modifier.character)) {
-							throw new Error(`Can't parse newChoiceString ${newChoiceString}: Contains multiple ${controlCharacter}`);
+							throw new Error(`Can't parse newChoiceString ${newChoiceString}: Contains multiple ${modifier.character}`);
 						}
 						if (newChoiceString.includes(modifier.character)) {
 							var pieces = newChoiceString.split(modifier.character);
@@ -105,10 +116,12 @@ function containsMultiple(string, searchCharacter) {
 	if (index2 != -1) return true; else return false;
 }
 
+var currentPassage;
+
 function populatePage(passage) {
-	document.getElementById('current-passage').innerHTML = passage.paragraphs;
+	document.getElementById('current-passage').innerHTML = passage.html;
 	document.getElementById('choices').innerHTML = passage.choices.map(passageLink).join("\n");
-	window.currentPassage = passage; // for debugging
+	currentPassage = passage; // for debugging
 }
 
 function passageLink(choice) {
@@ -122,15 +135,13 @@ function passageLink(choice) {
 loadScene()
 	.then(scene => processPassages(scene))
 	.then(passages => {
-		window.passages = passages;
-		console.log(passages)
 		populatePage(passages.Start);
 	})
 ;
 
 const history = [];
 
-var sum = function(a,b) {
-	return a + b;
-}
-module.exports = { sum };
+module.exports = { 
+	processPassages, 
+	processChoices 
+};
