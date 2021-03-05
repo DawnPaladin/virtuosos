@@ -21,13 +21,15 @@ Second scene
       name: "Start",
       html: "<p>First scene</p>",
       choices: processChoices("> Choice"),
-      visited: false
+      visited: false,
+      oneWay: false
     })
     expect(passages["Scene two"]).to.eql({
       name: "Scene two",
       html: "<p>Second scene</p>",
       choices: processChoices("> Other choice"),
-      visited: false
+      visited: false,
+      oneWay: false
     })
   })
 })
@@ -39,8 +41,8 @@ describe("processChoices", () => {
     > "I had only one chance to hit the target.": Target
     > "This will come in handy later.": Sneaky tool = ShortcutName
     ShortcutName
-    ?saw all of ["Who's on first?", "What's on second?", "I don't know's on third"]
-  `
+    ?saw all of ["Simple choice"]: "Only one option": Target
+  `;
   var choices = processChoices(input);
   it("should define a simple choice", () => {
     expect(choices[0]).to.have.property("name", "Simple choice")
@@ -48,7 +50,6 @@ describe("processChoices", () => {
   });
   it("should strip quotes", () => {
     expect(choices[1]).to.have.property("name", "It was a simple choice, she said.")
-    expect(choices[1]).to.have.property("target", "It was a simple choice, she said.")
   });
   it("should be able to target a named passage", () => {
     expect(choices[2]).to.have.property("name", "I had only one chance to hit the target.")

@@ -26,8 +26,6 @@
 	<script>
 		document.getElementById('choices').addEventListener('click', event => {
 			const targetName = event.target.dataset.target;
-			history.push(targetName);
-			passages[targetName].visited = true;
 			populatePage(passages[targetName]);
 		});
 	</script>

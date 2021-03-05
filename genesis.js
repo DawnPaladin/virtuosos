@@ -9,7 +9,6 @@ async function loadScene() {
 }
 
 const passages = {};
-const choiceShortcuts = {};
 
 /**
  * Take the contents of a scene file and split it into an dict of Passage objects, organized by name.
@@ -24,15 +23,20 @@ var processPassages = function(scene) {
 			var name = "Start";
 			const pieces = passageText.split("---");
 			var paragraphs = pieces[0].split('\n\n');
+			var oneWay = false;
 			if (paragraphs[0].trim().substr(-1, 1) == ":") { // if first paragraph ends with :
 				name = paragraphs.shift().slice(0, -1).replaceAll("\"", "").trim(); // give the passage a name
 			}
-			if (names.includes(name)) {
+			if (names.includes(name)) { // if name is a duplicate
 				if (name == "Start") {
 					throw new Error("Only one passage name can be empty." + passageText)
 				}
 				throw new Error("Duplicate passage name" + name);
 			} else {
+				if (name[0] == "!") {
+					oneWay = true;
+					name = name.slice(1);
+				}
 				names.push(name);
 			}
 			const html = paragraphs
@@ -41,19 +45,23 @@ var processPassages = function(scene) {
 				.join('\n')
 			;
 			const choices = pieces.length > 1 ? processChoices(pieces[1]) : [];
-			const passage = { name, html, choices, visited: false };
+			const passage = { name, html, choices, visited: false, oneWay };
 			passages[name] = passage;
 		})
 	;
 	return passages;
 }
 
-/** 
- * @typedef {Object} Choice
- * @property {String} name
- * @property {String} target
- * @property {String} [shortcut]
- */
+class Choice {
+	constructor() {
+		this.name = "";
+		this.target = "";
+		this.requirements = [];
+	}
+}
+const choiceShortcuts = {};
+const passageHistory = [];
+
 /**
  * Turn a string containing several choices into an array of Choice objects.
  * @param {string} choicesText Choices separated by newlines
@@ -64,57 +72,111 @@ var processChoices = function(choicesText) {
 		.split('\n')
 		.filter(element => element != "")
 		.map(choiceText => {
-			var choiceObj = {};
-			choiceText = choiceText.replaceAll("\"", "").trim(); // strip quotes
+			choiceText = choiceText.trim();
+			var choiceObj = new Choice();
 			if (choiceText[0] == ">") { // "> " means we're defining a new choice for the player
-				var newChoiceString = choiceText.replace("> ", "");
-				const choiceModifiers = [
-					{ character: "=", name: "shortcut"},
-					{ character: ":", name: "target"}
-				]
-				// if there are no modifiers, the choice's name and target default to newChoiceString
-				choiceObj.name = "";
-				choiceObj.target = "";
-				// iterate through possible choice modifiers in order, breaking down the choice string from right to left
-				(function breakdown() {
-					// if (choiceText.includes("Who are you?")) debugger;
-					choiceModifiers.forEach(modifier => {
-						if (containsMultiple(newChoiceString, modifier.character)) {
-							throw new Error(`Can't parse newChoiceString ${newChoiceString}: Contains multiple ${modifier.character}`);
-						}
-						if (newChoiceString.includes(modifier.character)) {
-							var pieces = newChoiceString.split(modifier.character);
-							choiceObj.name = pieces[0].trim();
-							choiceObj[modifier.name] = pieces[1].trim();
-							newChoiceString = pieces[0].trim(); // cut the modifier off the end of newChoiceString
-							if (modifier.name == "shortcut") {
-								choiceShortcuts[pieces[1].trim()] = choiceObj;
-							}
-							breakdown(); // and analyze it again
-						}
-					})
-				})();
-				if (choiceObj.name == "") choiceObj.name = newChoiceString;
-				if (choiceObj.target == "") choiceObj.target = newChoiceString;
+				choiceObj = breakdownNewChoiceString(choiceText.replace("> ", ""))
 			} else if (choiceText[0] == "?") {
-				// parse(choiceText, "?saw all of", function())
-				// TODO
-				choiceObj = { name: "conditional link", target: "Start" }
+				choiceObj = conditionalChoice(choiceText);
 			} else { // choiceText is the name of a shortcut
 				choiceObj = choiceShortcuts[choiceText];
 			}
-		return choiceObj;
-	});
+			return choiceObj;
+		})
+	;
 	return choices;
 }
 
-function parse(string, substring, callback) {
-	if (string.startsWith(substring)) {
+/**
+ * @param {*} choiceText 
+ * @return {Choice} 
+ */
+function conditionalChoice(choiceText) {
+	var choiceObj = parseForward(choiceText, "?saw all of", function(stringAfterThat) {
+		var beforeBetweenAndAfterSquareBrackets = /(.*)\[(.*)\](.*)/g;
+		var matches = beforeBetweenAndAfterSquareBrackets.exec(stringAfterThat);
+		var before = matches[1].trim();
+		var between = matches[2].trim();
+		var after = matches[3].trim();
+		var choiceText = parseForward(after, ":", text => text);
+		var requirements = between.split(',').map(element => element.replaceAll("\"", "").trim()); // strip slashes
+		var choiceObj = breakdownNewChoiceString(choiceText);
+		choiceObj.requirements = requirements;
+		return choiceObj;
+	})
+	return choiceObj;
+}
+
+/**
+ * @param {String} newChoiceString
+ * @return {Choice} Choice
+ */
+function breakdownNewChoiceString(newChoiceString) {
+	const choiceModifiers = [
+		{ character: "=", name: "shortcut"},
+		{ character: ":", name: "target"}
+	]
+	var choiceObj = new Choice();
+
+	newChoiceString = newChoiceString.replaceAll("\"", "").trim(); // strip quotes
+	// iterate through possible choice modifiers in order, breaking down the choice string from right to left
+	(function breakdown() {
+		choiceModifiers.forEach(modifier => {
+			if (newChoiceString.includes(modifier.character)) {
+				// Sample input: "Choice name": Choice target
+				// Desired output:
+				/* choiceObj = {
+					name: "Choice name",
+					target: "Choice target"
+				} */
+
+				if (containsMultiple(newChoiceString, modifier.character)) {
+					throw new Error(`Can't parse newChoiceString ${newChoiceString}: Contains multiple ${modifier.character}`);
+				}
+				
+				var pieces = newChoiceString.split(modifier.character);
+				choiceObj.name = pieces[0].trim();
+				choiceObj[modifier.name] = pieces[1].trim();
+				newChoiceString = pieces[0].trim(); // cut the modifier off the end of newChoiceString
+				if (modifier.name == "shortcut") {
+					choiceShortcuts[pieces[1].trim()] = choiceObj;
+				}
+				breakdown(); // and analyze it again
+			}
+		})
+	})();
+	if (choiceObj.name == "") choiceObj.name = newChoiceString;
+	if (choiceObj.target == "") choiceObj.target = newChoiceString;
+	return choiceObj;
+}
+
+/**
+ * Snip off a specific part of a string and perform a function on the rest.
+ * @param {boolean} forward Parse from the left instead of the right
+ * @param {*} string Input string to process
+ * @param {*} substring Substring to search for. If forward is true, we'll look at the start of the string; otherwise we'll look at the end.
+ * @param {*} successCallback Callback to run if substring is found. It will be passed the input string, minus the substring. 
+ * @param {function} failureCallback Callback to run if substring isn't found.
+ * @return {*} 
+ */
+function parse(forward, string, substring, successCallback, failureCallback) {
+	if (forward ? string.startsWith(substring) : string.endsWith(substring)) {
 		var newString = string.slice(substring.length);
-		return callback(newString);
+		return successCallback(newString);
 	} else {
-		return false;
+		if (failureCallback) {
+			return failureCallback(string);
+		} else {
+			throw new Error(`Couldn't parse "${substring}" out of "${string}"`);
+		}
 	}
+}
+// Syntactic sugar for parse()
+function parseForward(string, substring, successCallback, failureCallback) {
+	return parse(true, string, substring, successCallback, failureCallback);
+}
+function parseBackward(string, substring, successCallback, failureCallback) {
+	return parse(false, string, substring, successCallback, failureCallback);
 }
 
 function containsMultiple(string, searchCharacter) {
@@ -129,6 +191,8 @@ function populatePage(passage) {
 	document.getElementById('current-passage').innerHTML = passage.html;
 	document.getElementById('choices').innerHTML = passage.choices.map(passageLink).join("\n");
 	currentPassage = passage; // for debugging
+	passageHistory.push(passage.name);
+	passages[passage.name].visited = true;
 }
 
 function passageLink(choice) {
@@ -136,19 +200,29 @@ function passageLink(choice) {
 	if (!Object.keys(passages).includes(choice.target)) {
 		throw new Error(choice.target + " is not a valid passage name");
 	}
-	return `<a href="#" data-target="${choice.target}" class="${className}">${choice.name}</a>`;
+
+	var meetsRequirements = choice.requirements.every(requirement => passageHistory.includes(requirement));
+	if (meetsRequirements == true) {
+		return `<a href="#" data-target="${choice.target}" class="${className}">${choice.name}</a>`;
+	} else {
+		return "";
+	}
 }
 
-loadScene()
-	.then(scene => processPassages(scene))
-	.then(passages => {
-		populatePage(passages.Start);
-	})
-;
-
-const history = [];
-
-module.exports = { 
-	processPassages, 
-	processChoices 
-};
+if (typeof window !== "undefined") { // if in browser
+	loadScene()
+		.then(scene => processPassages(scene))
+		.then(passages => {
+			populatePage(passages.Start);
+		})
+	;
+} else { // if in NodeJS
+	try {
+		module.exports = { // export for testing
+			processPassages, 
+			processChoices 
+		};
+	} catch (err) {
+		console.error(err);
+	}
+}
