@@ -4,7 +4,7 @@ html {
 body {
 	background: #20283D;
 	color: white;
-	font-family: 'Roboto Slab', serif;
+	font-family: 'Merriweather', serif;
 	font-weight: 300;
 	margin: 0;
 	height: 100%;
@@ -21,11 +21,17 @@ section {
 	line-height: 34px;
 	padding: 0 1em;
 }
+strong {
+	font-weight: 700;
+}
 .section-container {
 	width: 100%;
 }
 .last-choice-container {
 	background: #171D2E;
+}
+#last-choice {
+	font-style: italic;
 }
 .current-passage-container {
 	flex-grow: 1;
