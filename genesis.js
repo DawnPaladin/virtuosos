@@ -42,6 +42,8 @@ var processPassages = function(scene) {
 			const html = paragraphs
 				.map(paragraph => paragraph.trim())
 				.map(paragraph => "<p>" + paragraph + "</p>")
+				.map(paragraph => paragraph.replace(/\*(.*)\*/g, "<strong>$1</strong>"))
+				.map(paragraph => paragraph.replace(/_(.*)_/g, "<em>$1</em>"))
 				.join('\n')
 			;
 			const choices = pieces.length > 1 ? processChoices(pieces[1]) : [];
