@@ -18,6 +18,7 @@ section {
 	max-width: 700px;
 	margin: auto;
 	line-height: 34px;
+	padding: 0 1em;
 }
 .section-container {
 	width: 100%;
@@ -35,7 +36,6 @@ section {
 .choices-container {
 	flex-grow: 1;
 	background: #171D2E;
-	padding: 1em 0;
 }
 #choices {
 	font-size: 24px;
