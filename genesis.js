@@ -25,7 +25,7 @@ var processPassages = function(scene) {
 			var paragraphs = pieces[0].split('\n\n');
 			var oneWay = false;
 			if (paragraphs[0].trim().substr(-1, 1) == ":") { // if first paragraph ends with :
-				name = paragraphs.shift().slice(0, -1).replaceAll("\"", "").trim(); // give the passage a name
+				name = generateSlug(paragraphs.shift().slice(0, -1)); // give the passage a name
 			}
 			if (names.includes(name)) { // if name is a duplicate
 				if (name == "Start") {
@@ -54,7 +54,7 @@ var processPassages = function(scene) {
 
 class Choice {
 	constructor() {
-		this.name = "";
+		this.text = "";
 		this.target = "";
 		this.requirements = [];
 	}
@@ -99,7 +99,7 @@ function conditionalChoice(choiceText) {
 		var between = matches[2].trim();
 		var after = matches[3].trim();
 		var choiceText = parseForward(after, ":", text => text);
-		var requirements = between.split(',').map(element => element.replaceAll("\"", "").trim()); // strip slashes
+		var requirements = between.split(',');
 		var choiceObj = breakdownNewChoiceString(choiceText);
 		choiceObj.requirements = requirements;
 		return choiceObj;
@@ -118,7 +118,6 @@ function breakdownNewChoiceString(newChoiceString) {
 	]
 	var choiceObj = new Choice();
 
-	newChoiceString = newChoiceString.replaceAll("\"", "").trim(); // strip quotes
 	// iterate through possible choice modifiers in order, breaking down the choice string from right to left
 	(function breakdown() {
 		choiceModifiers.forEach(modifier => {
@@ -126,8 +125,8 @@ function breakdownNewChoiceString(newChoiceString) {
 				// Sample input: "Choice name": Choice target
 				// Desired output:
 				/* choiceObj = {
-					name: "Choice name",
-					target: "Choice target"
+					text: "Choice text",
+					target: "choice-target",
 				} */
 
 				if (containsMultiple(newChoiceString, modifier.character)) {
@@ -135,18 +134,20 @@ function breakdownNewChoiceString(newChoiceString) {
 				}
 				
 				var pieces = newChoiceString.split(modifier.character);
-				choiceObj.name = pieces[0].trim();
-				choiceObj[modifier.name] = pieces[1].trim();
-				newChoiceString = pieces[0].trim(); // cut the modifier off the end of newChoiceString
+				var text = pieces[0].trim();
+				var slug = generateSlug(pieces[1]);
+				choiceObj.text = text;
+				choiceObj[modifier.name] = slug;
+				newChoiceString = text; // cut the modifier off the end of newChoiceString
 				if (modifier.name == "shortcut") {
-					choiceShortcuts[pieces[1].trim()] = choiceObj;
+					choiceShortcuts[slug] = choiceObj;
 				}
 				breakdown(); // and analyze it again
 			}
 		})
 	})();
-	if (choiceObj.name == "") choiceObj.name = newChoiceString;
-	if (choiceObj.target == "") choiceObj.target = newChoiceString;
+	if (choiceObj.text == "") choiceObj.text = newChoiceString;
+	if (choiceObj.target == "") choiceObj.target = generateSlug(newChoiceString);
 	return choiceObj;
 }
 
@@ -185,9 +186,14 @@ function containsMultiple(string, searchCharacter) {
 	if (index2 != -1) return true; else return false;
 }
 
+function generateSlug(string) {
+	return string.trim().toLowerCase().replaceAll(" ", "-").replaceAll("\"", "");
+}
+
 var currentPassage;
 
 function populatePage(passage, choiceText) {
+	if (!passage) throw new Error("Passage is "+passage)
 	if (choiceText) document.getElementById('last-choice').innerHTML = choiceText;
 	document.getElementById('current-passage').innerHTML = passage.html;
 	document.getElementById('choices').innerHTML = passage.choices.map(passageLink).join("\n");
@@ -209,7 +215,7 @@ function passageLink(choice) {
 
 	var meetsRequirements = choice.requirements.every(requirement => passageHistory.includes(requirement));
 	if (meetsRequirements == true) {
-		return `<a href="#" data-target="${choice.target}" class="${className}">${choice.name}</a>`;
+		return `<a href="#" data-target="${choice.target}" class="${className}">${choice.text}</a>`;
 	} else {
 		return "";
 	}
