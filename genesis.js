@@ -196,7 +196,7 @@ function populatePage(passage) {
 }
 
 function passageLink(choice) {
-	var className = choice.visited ? "visited" : "unvisited";
+	var className = passageHistory.includes(choice.target) ? "visited" : "unvisited";
 	if (!Object.keys(passages).includes(choice.target)) {
 		throw new Error(choice.target + " is not a valid passage name");
 	}

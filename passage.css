@@ -54,3 +54,6 @@ section {
 #choices a:hover {
 	opacity: 1;
 }
+#choices a.visited {
+	color: gray;
+}
