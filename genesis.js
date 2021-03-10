@@ -196,9 +196,14 @@ function populatePage(passage) {
 }
 
 function passageLink(choice) {
-	var className = passageHistory.includes(choice.target) ? "visited" : "unvisited";
-	if (!Object.keys(passages).includes(choice.target)) {
+	var passageName = choice.target;
+	if (!Object.keys(passages).includes(passageName)) {
 		throw new Error(choice.target + " is not a valid passage name");
+	}
+	var passage = passages[passageName];
+	var className = passageHistory.includes(passageName) ? "visited" : "unvisited";
+	if (passage.oneWay) {
+		className += " one-way";
 	}
 
 	var meetsRequirements = choice.requirements.every(requirement => passageHistory.includes(requirement));

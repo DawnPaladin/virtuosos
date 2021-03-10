@@ -57,3 +57,14 @@ section {
 #choices a.visited {
 	color: gray;
 }
+#choices a.one-way::after {
+	content: "";
+	display: inline-block;
+	height: 1em;
+	width: 1em;
+	background-size: 1em;
+	background-image: url("img/page-turn-icon.svg");
+	background-repeat: no-repeat;
+	margin-left: .25em;
+	margin-bottom: -2px;
+}
