@@ -187,7 +187,8 @@ function containsMultiple(string, searchCharacter) {
 
 var currentPassage;
 
-function populatePage(passage) {
+function populatePage(passage, choiceText) {
+	if (choiceText) document.getElementById('last-choice').innerHTML = choiceText;
 	document.getElementById('current-passage').innerHTML = passage.html;
 	document.getElementById('choices').innerHTML = passage.choices.map(passageLink).join("\n");
 	currentPassage = passage; // for debugging
@@ -212,6 +213,12 @@ function passageLink(choice) {
 	} else {
 		return "";
 	}
+}
+
+var handleLinkClick = event => {
+	const choiceText = event.target.innerHTML;
+	const targetName = event.target.dataset.target;
+	populatePage(passages[targetName], choiceText);
 }
 
 if (typeof window !== "undefined") { // if in browser

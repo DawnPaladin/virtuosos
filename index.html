@@ -24,10 +24,7 @@
 	<script src="jquery-3.5.1.slim.min.js"></script>
 	<script src="genesis.js"></script>
 	<script>
-		document.getElementById('choices').addEventListener('click', event => {
-			const targetName = event.target.dataset.target;
-			populatePage(passages[targetName]);
-		});
+		document.getElementById('choices').addEventListener('click', handleLinkClick)
 	</script>
 </body>
 </html>
