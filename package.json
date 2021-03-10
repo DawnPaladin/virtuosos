@@ -4,7 +4,8 @@
   "description": "Mass Effect meets the Stormlight Archive",
   "main": "genesis.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "run": "http-server"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,7 @@
   "homepage": "https://github.com/DawnPaladin/virtuosos#readme",
   "devDependencies": {
     "chai": "^4.3.1",
+    "http-server": "^0.12.3",
     "mocha": "^8.3.0"
   }
 }
