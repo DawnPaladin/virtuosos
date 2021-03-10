@@ -79,8 +79,9 @@ var processChoices = function(choicesText) {
 			} else if (choiceText[0] == "?") {
 				choiceObj = conditionalChoice(choiceText);
 			} else { // choiceText is the name of a shortcut
-				choiceObj = choiceShortcuts[choiceText];
+				choiceObj = choiceShortcuts[generateSlug(choiceText)];
 			}
+			if (typeof choiceObj == "undefined") throw new Error("Undefined choice");
 			return choiceObj;
 		})
 	;
@@ -99,7 +100,7 @@ function conditionalChoice(choiceText) {
 		var between = matches[2].trim();
 		var after = matches[3].trim();
 		var choiceText = parseForward(after, ":", text => text);
-		var requirements = between.split(',');
+		var requirements = between.split(',').map(generateSlug);
 		var choiceObj = breakdownNewChoiceString(choiceText);
 		choiceObj.requirements = requirements;
 		return choiceObj;
