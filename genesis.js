@@ -231,6 +231,14 @@ var handleLinkClick = event => {
 	populatePage(passages[targetName], choiceText);
 }
 
+var jump = passageSlug => {
+	if (!passageSlug) {
+		return Object.keys(passages);
+	} else {
+		populatePage(passages[passageSlug]);
+	}
+}
+
 if (typeof window !== "undefined") { // if in browser
 	loadScene()
 		.then(scene => processPassages(scene))
