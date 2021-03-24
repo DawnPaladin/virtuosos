@@ -1,6 +1,6 @@
 async function loadScene() {
 	try {
-		const response = await fetch('angel-encounter.scene');
+		const response = await fetch('scenes/angel-encounter.scene');
 		const data = await response.text();
 		return data;
 	} catch (err) {
