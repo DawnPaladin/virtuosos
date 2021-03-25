@@ -60,6 +60,7 @@ class Choice {
 		this.text = "";
 		this.target = "";
 		this.requirements = [];
+		this.virtueChanges = [];
 	}
 }
 const choiceShortcuts = {};
@@ -112,20 +113,37 @@ function conditionalChoice(choiceText) {
 }
 
 /**
- * @param {String} newChoiceString
+ * @param {String} choiceString
  * @return {Choice} Choice
  */
-function breakdownNewChoiceString(newChoiceString) {
+function breakdownNewChoiceString(choiceString) {
 	const choiceModifiers = [
 		{ character: "=", name: "shortcut"},
 		{ character: ":", name: "target"}
 	]
 	var choiceObj = new Choice();
 
+	// sample input: "> Refuse to back down: Fight the bully (Bold +1 Heart +1) = Fight"
+	var extractFromParens = /(.*)\((.*)\)(.*)/;
+	if (extractFromParens.test(choiceString)) {
+		var matches = extractFromParens.exec(choiceString);
+		var beforeParens = matches[1].trim();  // sample: "> Refuse to back down: Fight the bully"
+		var betweenParens = matches[2].trim(); // sample: "Bold +1 Heart +1"
+		var afterParens = matches[3].trim();   // sample: "= Fight"
+		choiceString = beforeParens + ' ' + afterParens; // sample: > Refuse to back down: Fight the bully = Fight
+
+		var virtueRewardArrays = [...betweenParens.matchAll(/(.*?) ([+-]\d*)/g)];
+		virtueRewardArrays.forEach(array => {
+			var trait = array[1].trim() // sample: "Bold"
+			var modifier = array[2].trim() // sample: "+1"
+			choiceObj.virtueChanges.push({ trait, modifier });
+		})
+	}
+
 	// iterate through possible choice modifiers in order, breaking down the choice string from right to left
 	(function breakdown() {
 		choiceModifiers.forEach(modifier => {
-			if (newChoiceString.includes(modifier.character)) {
+			if (choiceString.includes(modifier.character)) {
 				// Sample input: "Choice name": Choice target
 				// Desired output:
 				/* choiceObj = {
@@ -133,16 +151,16 @@ function breakdownNewChoiceString(newChoiceString) {
 					target: "choice-target",
 				} */
 
-				if (containsMultiple(newChoiceString, modifier.character)) {
-					throw new Error(`Can't parse newChoiceString ${newChoiceString}: Contains multiple ${modifier.character}`);
+				if (containsMultiple(choiceString, modifier.character)) {
+					throw new Error(`Can't parse choiceString ${choiceString}: Contains multiple ${modifier.character}`);
 				}
 				
-				var pieces = newChoiceString.split(modifier.character);
+				var pieces = choiceString.split(modifier.character);
 				var text = pieces[0].trim();
 				var slug = generateSlug(pieces[1]);
 				choiceObj.text = text;
 				choiceObj[modifier.name] = slug;
-				newChoiceString = text; // cut the modifier off the end of newChoiceString
+				choiceString = text; // cut the modifier off the end of newChoiceString
 				if (modifier.name == "shortcut") {
 					choiceShortcuts[slug] = choiceObj;
 				}
@@ -150,8 +168,8 @@ function breakdownNewChoiceString(newChoiceString) {
 			}
 		})
 	})();
-	if (choiceObj.text == "") choiceObj.text = newChoiceString;
-	if (choiceObj.target == "") choiceObj.target = generateSlug(newChoiceString);
+	if (choiceObj.text == "") choiceObj.text = choiceString;
+	if (choiceObj.target == "") choiceObj.target = generateSlug(choiceString);
 	return choiceObj;
 }
 
