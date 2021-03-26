@@ -8,6 +8,8 @@ async function loadScene() {
 	}
 }
 
+import player from './player.js';
+
 const passages = {};
 
 /**
@@ -60,7 +62,7 @@ class Choice {
 		this.text = "";
 		this.target = "";
 		this.requirements = [];
-		this.virtueChanges = [];
+		this.traitChangeStr = "";
 	}
 }
 const choiceShortcuts = {};
@@ -131,13 +133,7 @@ function breakdownNewChoiceString(choiceString) {
 		var betweenParens = matches[2].trim(); // sample: "Bold +1 Heart +1"
 		var afterParens = matches[3].trim();   // sample: "= Fight"
 		choiceString = beforeParens + ' ' + afterParens; // sample: > Refuse to back down: Fight the bully = Fight
-
-		var virtueRewardArrays = [...betweenParens.matchAll(/(.*?) ([+-]\d*)/g)];
-		virtueRewardArrays.forEach(array => {
-			var trait = array[1].trim() // sample: "Bold"
-			var modifier = array[2].trim() // sample: "+1"
-			choiceObj.virtueChanges.push({ trait, modifier });
-		})
+		choiceObj.traitChangeStr = betweenParens;
 	}
 
 	// iterate through possible choice modifiers in order, breaking down the choice string from right to left
@@ -214,9 +210,14 @@ function generateSlug(string) {
 
 var currentPassage;
 
-function populatePage(passage, choiceText) {
+function populatePage(passage, choiceText, traitChanges) {
 	if (!passage) throw new Error("Passage is "+passage)
-	if (choiceText) document.getElementById('last-choice').innerHTML = choiceText;
+	if (choiceText) {
+		if (traitChanges) {
+			choiceText += ` <small>(${traitChanges})</small>`;
+		}
+		document.getElementById('last-choice').innerHTML = choiceText;
+	}
 	document.getElementById('current-passage').innerHTML = passage.html;
 	document.getElementById('choices').innerHTML = passage.choices.map(passageLink).join("\n");
 	currentPassage = passage; // for debugging
@@ -237,7 +238,7 @@ function passageLink(choice) {
 
 	var meetsRequirements = choice.requirements.every(requirement => passageHistory.includes(requirement));
 	if (meetsRequirements == true) {
-		return `<a href="#" data-target="${choice.target}" class="${className}">${choice.text}</a>`;
+		return `<a href="#" data-target="${choice.target}" data-trait-changes="${choice.traitChangeStr}" class="${className}">${choice.text}</a>`;
 	} else {
 		return "";
 	}
@@ -246,7 +247,9 @@ function passageLink(choice) {
 var handleLinkClick = event => {
 	const choiceText = event.target.innerHTML;
 	const targetName = event.target.dataset.target;
-	populatePage(passages[targetName], choiceText);
+	const traitChanges = event.target.dataset.traitChanges;
+	player.changeTraits(traitChanges);
+	populatePage(passages[targetName], choiceText, traitChanges);
 }
 
 var jump = passageSlug => {
@@ -264,6 +267,9 @@ if (typeof window !== "undefined") { // if in browser
 			populatePage(passages.Start);
 		})
 	;
+	document.getElementById('choices').addEventListener('click', handleLinkClick);
+	// @ts-ignore
+	window.jump = jump;
 } else { // if in NodeJS
 	try {
 		module.exports = { // export for testing
