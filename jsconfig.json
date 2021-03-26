@@ -6,5 +6,5 @@
 	  "checkJs": true,
 	},
 	"exclude": ["node_modules", "**/node_modules/*"],
-	"include": ["genesis.js"],
+	"include": ["scene-parser.js"],
 }

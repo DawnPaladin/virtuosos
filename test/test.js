@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var { processPassages, processChoices } = require('../genesis');
+var { processPassages, processChoices } = require('../scene-parser');
 
 describe("processPassages", () => {
   var input = `
