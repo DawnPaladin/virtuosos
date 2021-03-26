@@ -39,3 +39,13 @@ These choices won't show up for the user unless they meet the requirements. For 
 ```
 
 This choice is named "Power?", targets "Why are you here?", and will only appear if the player has visited both "Who are you?" and "Cherubim?"
+
+### Changing traits
+
+Some choices change the people who make them. Denote this like so:
+
+```
+> Stand boldly (Bold +1 Heart +1)
+```
+
+If the trait doesn't already exist, it will be initialized at 0. All trait changes are logged to the console.
