@@ -31,7 +31,7 @@ You hear a whirring sound to your left; a baseball-sized robot flies through the
 
 There's a soft _ding!_ and the guy turns around and hands you a container with a dark liquid inside. "Here. Coffee."
 
-You slowly sip the coffee, feeling warm gradually flow back into your body. The guy watches you. He's young, in his twenties. He's wearing an orange robe, a turban, and a scraggly beard. He seems nervous. It's probably not every day one of his Amazon packages shows up with a person inside.
+You slowly sip the coffee, feeling warmth gradually flow back into your body. The guy watches you. He's young, in his twenties. He's wearing an orange robe, a turban, bare feet, and a scraggly beard. He seems nervous. It's probably not every day one of his Amazon packages shows up with a person inside.
 
 ---
 
@@ -39,22 +39,30 @@ You slowly sip the coffee, feeling warm gradually flow back into your body. The 
 
 ===
 
-"Nice to meet you, ${playerName}. I'm Vihaan Khatri. I'm our botanist." He shifts uncomfortably. "So how did you wind up in with my soybeans?"
+"Nice to meet you, ${playerName}. I'm Vihaan Khatri. I'm a botanist." He shifts uncomfortably. "So how did you wind up in with my soybeans?"
 
 ---
 
-"I made some bad decisions."
+"I made some bad decisions." (Vihaan.trust -10)
+"What's the worst job you've ever had?"
 
 ===
 
-He laughs quietly. "Okay. Well. This is a new one for me. Uh... I guess first thing is that you need a place to stay. Are you OK? Your lips were looking a little blue there."
+Vihaan thinks about it. "I had a boss who was a total asshole. Super demanding and never gave me credit for any of my work."
 
-Your arms and legs aren't numb any more. Instead they are itching violently. You've read somewhere that the fact that you can feel anything is a good sign.
+"Okay. Picture that, except you're not allowed to leave."
 
----
+You take another sip of coffee. It's spicy, with kind of a fruity taste. It tastes like freedom. You grip it a little tighter. "I worked in an orbital warehouse for Amazon.com. Most of the work handling the merchandise is automated. But the automation's not perfect, so each warehouse employs a few people to fix the drones when they get stuck.
 
-"I'm good.": Proceed
-"Give me a minute.": Continue recovery
+"Normally you work 8-hour shifts, so there are 3 shifts. No weekends, but the robots don't always need attention, and a contract only lasts 6 months, and the pay is good.
 
-===
+"It sounded pretty good. Logan Carson, one of my old friends from high school, got made the Baron of North Pacific 9. He says come on up, you can work in my warehouse, it'll be great.
+
+"And it was great, for a while. Barons can run their satellites however they want, as long as the packages arrive on time. Great food, great entertainment. And good friends, too - turns out I wasn't the only one of Logan's high school friends he'd brought up there. My friend Aubrey who I haven't seen in five years works the shift after mine.
+
+"So things are just running along as nice as you please when thing start getting weird between Logan and Aubrey. He starts scheduling a lot of meetings with her one-on-one, buying her gifts, coming by her room while she's off shift, stuff like that. Logan has always been kind of an irresistable force, but if there's one thing Aubrey hates it's being pushed around.
+
+You hold the coffee mug aginst your chest. "I should have seen it coming. In retrospect, the whole reason Logan was hiring people from his high school class was as a power trip. One day Aubrey told him to leave her alone. It was in public, in front of a bunch of people. The next day she was gone.
+
+"Not 'gone' as in fired, either. She didn't show up for work. She wasn't in her room. She wasn't on the station, and none of the passenger shuttles had left. We searched everywhere. She was just gone.
 
