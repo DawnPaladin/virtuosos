@@ -1,6 +1,6 @@
 async function loadScene() {
 	try {
-		const response = await fetch('scenes/angel-encounter.scene');
+		const response = await fetch('scenes/capsule-docking.scene');
 		const data = await response.text();
 		return data;
 	} catch (err) {
@@ -22,17 +22,21 @@ var processPassages = function(scene) {
 	scene
 		.split('===')
 		.forEach(passageText => {
-			var name = "Start";
+			var name = "";
 			const pieces = passageText.split("---");
 			var paragraphs = pieces[0].split('\n\n');
 			var oneWay = false;
-			if (paragraphs[0].trim().substr(-1, 1) == ":") { // if first paragraph ends with :
+			var firstPara = paragraphs[0];
+			if (firstPara == "") {
+				paragraphs.shift();
+				firstPara = paragraphs[0];
+			}
+			if (firstPara.trim().substr(-1, 1) == ":") { // if first paragraph ends with :
 				name = generateSlug(paragraphs.shift().slice(0, -1)); // give the passage a name
+			} else { // if no name specified...
+				name = generateSlug(firstPara); // ...just use the first paragraph
 			}
 			if (names.includes(name)) { // if name is a duplicate
-				if (name == "Start") {
-					throw new Error("Only one passage name can be empty." + passageText)
-				}
 				throw new Error("Duplicate passage name" + name);
 			} else {
 				if (name[0] == "!") {
@@ -52,6 +56,7 @@ var processPassages = function(scene) {
 			const choices = pieces.length > 1 ? processChoices(pieces[1]) : [];
 			const passage = { name, html, choices, visited: false, oneWay };
 			passages[name] = passage;
+			if (passages.start === undefined) passages.start = passage; // always start at the first passage
 		})
 	;
 	return passages;
@@ -81,8 +86,11 @@ var processChoices = function(choicesText) {
 			choiceText = choiceText.trim();
 			var choiceObj = new Choice();
 			if (choiceText[0] == ">") { // "> " means we're defining a new choice for the player
-				choiceObj = breakdownNewChoiceString(choiceText.replace("> ", ""))
-			} else if (choiceText[0] == "?") {
+				choiceObj = breakdownNewChoiceString(choiceText.replace("> ", ""));
+			} else if (choiceText[0] == '"') { // a quote means we're defining a dialog option
+				choiceObj = breakdownNewChoiceString(choiceText);
+			}
+			else if (choiceText[0] == "?") {
 				choiceObj = conditionalChoice(choiceText);
 			} else { // choiceText is the name of a shortcut
 				choiceObj = choiceShortcuts[generateSlug(choiceText)];
@@ -219,7 +227,7 @@ function populatePage(passage, choiceText, traitChanges) {
 		document.getElementById('last-choice').innerHTML = choiceText;
 	}
 	document.getElementById('current-passage').innerHTML = passage.html;
-	document.getElementById('choices').innerHTML = passage.choices.map(passageLink).join("\n");
+	if (passage.choices) document.getElementById('choices').innerHTML = passage.choices.map(passageLink).join("\n");
 	currentPassage = passage; // for debugging
 	passageHistory.push(passage.name);
 	passages[passage.name].visited = true;
@@ -228,7 +236,8 @@ function populatePage(passage, choiceText, traitChanges) {
 function passageLink(choice) {
 	var passageName = choice.target;
 	if (!Object.keys(passages).includes(passageName)) {
-		throw new Error(choice.target + " is not a valid passage name");
+		console.warn(choice.target + " is not a valid passage name");
+		return `<div>${choice.text}</div>`;
 	}
 	var passage = passages[passageName];
 	var className = passageHistory.includes(passageName) ? "visited" : "unvisited";
@@ -264,7 +273,7 @@ if (typeof window !== "undefined") { // if in browser
 	loadScene()
 		.then(scene => processPassages(scene))
 		.then(passages => {
-			populatePage(passages.Start);
+			populatePage(passages.start);
 		})
 	;
 	document.getElementById('choices').addEventListener('click', handleLinkClick);

@@ -51,12 +51,14 @@ strong {
 	flex-direction: column;
 	justify-content: center;
 }
+#choices > * {
+	margin: .5em 0;
+}
 #choices a {
 	color: white;
 	text-decoration: none;
 	opacity: .75;
 	transition: opacity .25s;
-	margin: .5em 0;
 }
 #choices a:hover {
 	opacity: 1;
